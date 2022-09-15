@@ -11,7 +11,7 @@ interface MapGauge {
   [key: string]: Gauge<string>;
 }
 
-interface NewMetricRegister {
+export interface NewMetricRegister {
   name: string;
   description: string;
   labelNames: Array<string>;
@@ -56,11 +56,11 @@ export class PrometheusService {
     return this.monitoredMetricsHistogram[newMetricRegister.name];
   }
 
-  public registerGauge(name: string, help: string): Gauge<string> {
+  public registerGauge(name: string, description: string): Gauge<string> {
     if (this.monitoredMetricsGauges[name] === undefined) {
       const gauge = (this.monitoredMetricsGauges[name] = new Gauge({
         name: this.PROMETHEUS_APP_PREFIX + name,
-        help,
+        help: description,
       }));
       this.registry.registerMetric(gauge);
       this.monitoredMetricsGauges[name] = gauge;
