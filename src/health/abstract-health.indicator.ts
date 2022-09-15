@@ -9,7 +9,7 @@ import { Gauge } from 'prom-client';
 
 const TAG = 'HealthCheck';
 
-export abstract class BaseHealthIndicator extends HealthIndicator {
+export abstract class AbstractHealthIndicator extends HealthIndicator {
   public abstract name: string;
   public callMetrics: any;
 
@@ -56,8 +56,10 @@ export abstract class BaseHealthIndicator extends HealthIndicator {
 
     Logger.log('New Gauge Metric: ' + this.name, TAG, true);
     this.gaugesRegistered = true;
-    this.gauge = this.prometheusService.registerGauge(this.name, this.description);
-
+    this.gauge = this.prometheusService.registerGauge(
+      this.name,
+      this.description,
+    );
   }
 
   protected isDefined(value: string | undefined): boolean {
