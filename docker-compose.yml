@@ -1,0 +1,61 @@
+version: "3.8"
+
+services:
+
+  dev:
+    container_name: the-icaro/nestjs-simple-starter-project
+    image: nestjs-api-dev:1.0.0
+    build:
+        context: .
+        target: development
+        dockerfile: ./Dockerfile
+    command: npm run start:debug
+    ports:
+        - 3000:3000
+    networks:
+        - nesjs-network
+    volumes:
+        - .:/usr/src/app
+        - /usr/src/app/node_modules
+    restart: unless-stopped
+  prod:
+    container_name: nestjs_api_prod
+    image: nestjs-api-prod:1.0.0
+    build:
+        context: .
+        target: production
+        dockerfile: ./Dockerfile
+    command: npm run start:prod
+    ports:
+        - 3000:3000
+    networks:
+        - nesjs-network
+    volumes:
+        - .:/usr/src/app
+        - /usr/src/app/node_modules
+    restart: unless-stopped
+
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    ports:
+      - '9090:9090'
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: monitoring_grafana
+    restart: unless-stopped
+    links:
+      - prometheus:prometheus
+    volumes:
+      - ./data/grafana:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=
+    ports:
+      - '3000:3000'
+
+networks:
+    nesjs-network:
